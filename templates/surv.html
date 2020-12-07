@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+
+{% block title %} Home {% endblock %}
+<style>
+    img#bg {
+        width: 500px;
+        height: 400px;
+    }
+</style>
+{% block body %}
+<div class="container-fluid p-3 ">
+    <!-- <span id="checkit"></span> -->
+    <div class="row">
+        <div class="col md-5">
+            <div id="cam1_name" class="alert alert-success alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                    <span aria-hidden="true">x</span>
+                </button>
+        		<button id="name" onclick="gName()">Get Name</button>
+            </div>
+            <h3 align="center">Cam 1</h3>
+            <img id="bg" src="{{ url_for('webcam') }}" style="width: 100%;">
+        </div>
+        <div class="col md-5">
+            <div id="cam2_name" class="alert alert-success alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                    <span aria-hidden="true">x</span>
+                </button>
+        
+            </div>
+            <h3 align="center">Cam 2</h3>
+                <img id="bg" class="center" src="{{ url_for('video_viewer') }}" style="width: 100%;">
+        </div>
+        <div class="col-md-2 ">
+            <div class="mh-100 bg-dark text-white d-flex p-2 " style="height:1500px">Max Height 100%</div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+
+    function gName() {
+        var name = document.getElementById("name");
+        // console.log("aray bhai chal raha he");
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                data = JSON.parse(this.responseText);
+                name.innerHTML = data.name[0];
+                // $("#rerender").load(data.name[0]);
+                $('#cam1_name').text(data.name[0]);
+            }
+        }
+        xhr.open("POST", "/getName");
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.send(JSON.stringify({ status: "true" }));
+    };
+
+    function callme() {
+        // $('#checkit').append("callme loaded<br />");
+        gName();
+        setTimeout(callme, 5000);
+    }
+    callme();
+
+
+</script>
+
+<script src="js/script.js"></script>
+
+{% endblock %}

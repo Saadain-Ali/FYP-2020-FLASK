@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+
+{% block title %} Home {% endblock %}
+
+
+
+{% block body %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='recorder.js') }}"></script>
+<div  style="margin-left:15px; margin-right:15px">
+    <div class="row">
+        <div class="col md-12">
+
+            <div class="jumbotron p-3">
+
+                <h2>Manage <b>Students </b>  <button type="button"  class="btn btn-success float-right"
+                
+                  data-toggle="modal" data-target="#mymodal">Add New Students</button> </h2>
+
+
+                  <div class="form-group mb-3 has-search">
+                     <span class="fa fa-search form-control-feedback"></span>
+                     <input type="text" id="myInput" onkeyup="myFunction()" class="form-control" placeholder="Search username" aria-label="Search username" aria-describedby="basic-addon2">
+                   </div>
+                  
+
+
+                {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                {% for message in messages %}
+
+                <div class="alert alert-success alert-dismissable" role="alert">
+                  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+
+                        <span aria-hidden="true">x</span>
+
+                    </button>
+
+
+                {{message}}
+
+
+                </div>
+
+
+                {% endfor %}
+
+                {% endif %}
+                {% endwith %}
+
+
+                
+               
+                <table id="myTable" class="table table-hover table-striped table-dark table-responsive-sm">
+
+                  <tr>
+                     <th>First Name</th>
+                     <th>Last Name</th>
+                     <th>Email</th>
+                     <th>SID</th>
+                     <th>Age</th>
+                     <th>Gender</th>
+                     <th>EDIT</th>
+                     <th>DELETE</th>
+                     </tr>
+
+
+                   {% for row in employees %}
+                    <tr>
+                        <td>{{row.first_name}}</td>
+                        <td>{{row.last_name}}</td>
+                        <td>{{row.email}}</td>
+                        <td>{{row.sid}}</td>
+                        <td>{{row.age}}</td>
+                        <td>{{row.gender}}</td>
+
+                        <td>
+                            <a href="/update/{{row.sid}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.sid}}">Edit</a>
+                        </td>
+                        <td>
+                           <a href="/delete/{{row.sid}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Delete</a>
+
+                        </td>
+
+                    </tr>
+                    
+                  <!-- Modal Edit Employee-->
+<div id="modaledit{{row.sid}}" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+
+
+      <div class="modal-content">
+
+
+         <div class="modal-header">
+
+
+            <h4 class="modal-title">Update Information</h4>
+
+
+         </div>
+
+
+         <div class="modal-body">
+
+
+           
+
+            <form action="{{ url_for('update') }}" method="POST">
+
+
+               <div class="form-group">
+                  <label>First Name:</label>
+                   <input type="hidden"  name="oldSid" value="{{row.sid}}">
+
+                  <input type="text" class="form-control" name="first_name" value="{{row.first_name}}">
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>Last Name:</label>
+                  
+                  <input type="text" class="form-control" name="last_name" value="{{row.last_name}}">
+
+
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>Email:</label>
+
+                  <input type="text" class="form-control" name="email" value="{{row.email}}">
+
+
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>SID:</label>
+
+                  <input type="text" class="form-control" name="sid" value="{{row.sid}}" disabled>
+
+
+               </div>
+
+               <div class="sl-select">
+                  <select name="gender" name="gender">
+                      <option value="{{row.gender}}"  hidden="">{{row.gender}}</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                       <!-- <option value="Other">Other</option> -->
+                  </select>
+              </div>
+               
+
+               <div class="form-group">
+                  <label>Age:</label>
+
+                  <input type="text" class="form-control" name="age" value="{{row.age}}">
+               </div>
+
+               <div class="form-group">
+
+                  
+                  <button class="btn btn-primary" type="submit" onclick="return confirm('Are You Sure To Update ?')">Update</button> 
+
+
+               </div>
+
+
+            </form>
+
+
+         </div>
+
+
+         <div class="modal-footer">
+
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+
+         </div>
+
+
+      </div>
+
+
+   </div>
+
+</div>
+
+
+                    {% endfor %}
+
+
+                </table>
+
+
+            </div>
+
+
+
+                  <!-- Modal Add Employee-->
+
+
+<div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-header">
+
+            <h4 class="modal-title">Add Student</h4>
+         </div>
+         <div class="modal-body">
+         
+         <div class="row">
+            <div class="col-md-6">
+               <div class="container">
+            <h1>Record Video</h1>
+            <div id="recorder">
+              <button id="record">Record</button>
+              <button id="stop">Stop</button>
+              <a id="download"></a>
+              <script type="text/javascript" src="{{ url_for('static', filename='recorder.js') }}"></script>      
+            </div>
+            <img id="video" src="{{ url_for('video_viewer') }}" style="width: 100%;margin-block: 100px;" >
+               </div>
+            </div>
+
+            <div class="col-md-6">
+            <form action="{{url_for('insert')}}" method="POST">
+               <div class="form-group">
+                  <label>First Name:</label>
+                   <!-- <input type="hidden"  name="sid"> -->
+
+                  <input type="text" class="form-control" name="first_name" required="1">
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>Last Name:</label>
+                  
+                  <input type="text" class="form-control" name="last_name" required="1">
+
+
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>Email:</label>
+
+                  <input type="text" class="form-control" name="email" required="1">
+
+
+               </div>
+
+               <div class="form-group">
+
+
+                  <label>SID:</label>
+
+                  <input type="text" class="form-control" name="sid" required="1" >
+
+
+               </div>
+
+               <div class="sl-select">
+                  <select name="gender" name="gender">
+                      <option value=""  hidden="">Gender*</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                       <!-- <option value="Other">Other</option> -->
+                  </select>
+              </div>
+               
+
+               <div class="form-group">
+                  <label>Age:</label>
+
+                  <input type="text" class="form-control" name="age" required="1" >
+               </div>
+
+               <!-- <div class="form-group"> -->
+
+
+               <div class="form-group">
+
+
+                  <button class="btn btn-primary" type="submit" onclick="return confirm('Are You Sure To Add new Student ?')">Add Student</button>
+
+
+               </div>
+
+
+            </form>
+         </div>
+
+         </div>
+
+         </div>
+
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}
