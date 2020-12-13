@@ -175,7 +175,7 @@ def cam_stream():
     print('loadings')
     camName = 'Corridor1'
     if vcam == None:
-        vcam = Capturing(1,data)
+        vcam = Capturing(2,data)
         
     while True:
         name , frame = vcam.get_frame()
@@ -246,6 +246,8 @@ def getName():
 
 
 def add_info(stdn_list , loc):
+    if(len(stdn_list)==1 and "Unknown" in stdn_list):
+        return 0
     x = np.array(stdn_list)
     students = np.unique(x)
     time = datetime.now().strftime("%H:%M:%S")
@@ -259,6 +261,7 @@ def add_info(stdn_list , loc):
     else:
         std_info = info(students[0],"",loc,day,time )
         std_info.found()
+    return 1 
 
 if __name__ == "__main__":
     app.run(debug=True)

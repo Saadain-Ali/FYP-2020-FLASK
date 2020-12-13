@@ -12,10 +12,25 @@ class RecordingThread (threading.Thread):
         self.out = cv2.VideoWriter('./static/video.mp4',fourcc, 20.0, (640,480))
 
     def run(self):
+        self.cascadePath = "haarcascade_frontalface_default.xml"
+        self.faceCascade = cv2.CascadeClassifier(self.cascadePath)
+
         while self.isRunning:
             ret, frame = self.cap.read()
             if ret:
-                self.out.write(frame)
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                faces = self.faceCascade.detectMultiScale(
+                    gray,
+                    scaleFactor=1.2,
+                    minNeighbors=5
+                )
+                for (x,y,w,h) in faces:
+                    cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+                    roi_gray = gray[y:y+h, x:x+w]
+                    print('saving images')
+                    roi_color = frame[y:y+h, x:x+w]
+                # self.out.write(frame)
+                    self.out.write(roi_color)
 
         self.out.release()
 
@@ -29,7 +44,7 @@ class RecordingThread (threading.Thread):
 class VideoCamera(object):
     def __init__(self):
         # Open a camera
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
       
         # Initialize video recording environment
         self.is_record = False
