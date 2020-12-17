@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+{% block title %} Home {% endblock %}
+
+
+
+{% block body %}
+
+<div class="container">
+    <h2>Training {{student}}</h2>
+    <p id="note">Please Wait a while</p>
+    <button type="button" class="btn btn-primary" id="demo">Click on Me</button>
+    <br><br>
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped bg-danger progress-bar-animated active" role="progressbar" id="pg"
+            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:1%">
+        </div>
+    </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    var status = true;
+    $(document).ready(function () {
+        // $("#demo").on('click', function () {
+        function updateVal(val) {
+            // var progress = parseInt($("#pg").width() / $('#pg').parent().width() * 100);
+            // $("#pg").width((progress + val) + '%');
+            // $("#pg").html((progress + val) + '%');
+            if (val > 100) { val = 100; }
+            $("#pg").width(val + '%');
+            $("#pg").html(val + '%');
+        };
+
+
+
+        function gName() {
+            // var name = document.getElementById("name");
+            // console.log("aray bhai chal raha he");
+            if (status.toString() == true.toString()) {
+                var xhr = new XMLHttpRequest();
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        data = JSON.parse(this.responseText);
+                        if (data.value >= 100 || data.value < 0) {
+                            $("#note").html('DONE');
+                            updateVal(100);
+                            status = false;
+                            xhr.abort();
+                        }
+                        else {
+                            // name.innerHTML = data.value[0];
+                            console.log(data);
+                            console.log(data.value);
+                            // $("#rerender").load(data.name[0]);
+                            updateVal(data.value);
+                        }
+                        // $('#cam1_name').text(data.val[0]);
+                    }
+                }
+                if (status.toString() == true.toString()) {
+                    xhr.open("POST", "/trainer");
+                    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                    xhr.send(JSON.stringify({ status: status.toString() }));
+                }
+                else {
+                    xhr.open("POST", "/trainer");
+                    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                    xhr.send(JSON.stringify({ status: false.toString() }));
+                    xhr.abort();
+                }
+            }
+        };
+
+        function callme() {
+            console.log(status)
+            gName();
+            setTimeout(callme, 3000);
+
+        }
+
+        callme();
+
+    });
+</script>
+{% endblock %}

@@ -2,14 +2,13 @@
 {% include 'header.html' %}
 
 
-
 {% block title %} Home {% endblock %}
 
 
 
 {% block body %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='recorder.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='myrecorder.js') }}"></script>
 <div  style="margin-left:15px; margin-right:15px">
     <div class="row">
         <div class="col md-12">
@@ -226,11 +225,11 @@
             <div class="col-md-6">
                <div class="container">
             <h1>Record Video</h1>
-            <div id="recorder">
+            <div id="myrecorder">
               <button id="record">Record</button>
-              <button id="stop">Stop</button>
+              <button id="stop" disabled>Stop</button>
               <a id="download"></a>
-              <script type="text/javascript" src="{{ url_for('static', filename='recorder.js') }}"></script>      
+              <script type="text/javascript" src="{{ url_for('static', filename='myrecorder.js') }}"></script>      
             </div>
             <img id="video" src="{{ url_for('video_viewer') }}" style="width: 100%;margin-block: 100px;" >
                </div>
@@ -242,7 +241,7 @@
                   <label>First Name:</label>
                    <!-- <input type="hidden"  name="sid"> -->
 
-                  <input type="text" class="form-control" name="first_name" required="1">
+                  <input type="text" class="form-control" id="first_name" name="first_name" required="1">
                </div>
 
                <div class="form-group">
@@ -250,7 +249,7 @@
 
                   <label>Last Name:</label>
                   
-                  <input type="text" class="form-control" name="last_name" required="1">
+                  <input type="text" class="form-control" id="last_name" name="last_name"  required="1">
 
 
                </div>
@@ -260,7 +259,7 @@
 
                   <label>Email:</label>
 
-                  <input type="text" class="form-control" name="email" required="1">
+                  <input type="text" class="form-control"  id="email" name="email" required="1">
 
 
                </div>
@@ -270,13 +269,13 @@
 
                   <label>SID:</label>
 
-                  <input type="text" class="form-control" name="sid" required="1" >
+                  <input type="text" class="form-control" id="sid" name="sid" required="1" >
 
 
                </div>
 
                <div class="sl-select">
-                  <select name="gender" name="gender">
+                  <select id="gender" name="gender" name="gender">
                       <option value=""  hidden="">Gender*</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -288,7 +287,7 @@
                <div class="form-group">
                   <label>Age:</label>
 
-                  <input type="text" class="form-control" name="age" required="1" >
+                  <input type="text" class="form-control" id="age" name="age" required="1" >
                </div>
 
                <!-- <div class="form-group"> -->
@@ -323,6 +322,4 @@
 
 
 </div>
-
-
 {% endblock %}

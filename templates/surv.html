@@ -19,7 +19,6 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="close">
                     <span aria-hidden="true">x</span>
                 </button>
-        		<button id="name" onclick="gName()">Get Name</button>
             </div>
             <h3 align="center">Cam 1</h3>
             <img id="bg" src="{{ url_for('webcam') }}" style="width: 100%;">
@@ -35,7 +34,9 @@
                 <img id="bg" class="center" src="{{ url_for('video_viewer') }}" style="width: 100%;">
         </div>
         <div class="col-md-2 ">
-            <div class="mh-100 bg-dark text-white d-flex p-2 " style="height:1500px">Max Height 100%</div>
+            <div class=" bg-dark text-white d-flex p-2 " style="height:500px">
+                <button id="name" onclick="gName()">Get Name</button>
+            </div>
         </div>
     </div>
 </div>
@@ -53,6 +54,7 @@
             if (xhr.readyState == 4 && xhr.status == 200) {
                 data = JSON.parse(this.responseText);
                 name.innerHTML = data.name[0];
+                console.log(data[0]);
                 // $("#rerender").load(data.name[0]);
                 $('#cam1_name').text(data.name[0]);
             }

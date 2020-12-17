@@ -1,6 +1,7 @@
 import pickle
 import os
-
+from face_encoder import face_encoder
+import math
 from students_editor import students_editor
 from student import student
 from student import student_info as info
@@ -26,6 +27,8 @@ cam_frame = None
 video_camera = None
 global_frame = None
 g_frame = None
+prev_time = ""
+prev_name = ""
 current_name = ""
 count = 0
 
@@ -128,6 +131,38 @@ def delete(id):
 
     return redirect(url_for('Index'))
 
+counter = 0
+f=None
+@app.route('/trainer', methods = ['GET','POST'])
+def trainer():
+    global counter
+    global f
+    if f is None:
+        f = face_encoder('encodings_Allolf.pickle','dataset','hog')
+        f.start()
+    if request.method == 'POST':
+        json = request.get_json()
+        status = json['status']
+        print("status "+ status)
+        if status == "true" and f._running:
+            print(f.imgLen())
+            print(f.imageNumber())
+            counter = (f.imageNumber()/f.imgLen())*100
+            print(math.trunc(counter))
+            # if counter == 0.0:
+            #     print('stoposaafssaaaaa')
+            #     return jsonify(value="-1")
+            if counter > 100:
+                return jsonify(value="100")
+            else:
+                return jsonify(value = math.trunc(counter))
+        else:
+            return jsonify(value="-1")
+    
+    
+    # f.run()
+    return render_template("trainer.html",student ='Saadain')
+
 @app.route('/record_status', methods=['POST'])
 def record_status():
     global video_camera 
@@ -137,9 +172,12 @@ def record_status():
     json = request.get_json()
 
     status = json['status']
+    print(json)
+    
 
     if status == "true":
-        video_camera.start_record()
+        folderName = json['name']
+        video_camera.start_record(folderName)
         return jsonify(result="started")
     else:
         video_camera.stop_record()
@@ -172,18 +210,37 @@ def cam_stream():
     global vcam
     global cam_frame
     global current_name
+    global prev_name
+    global prev_time
     print('loadings')
     camName = 'Corridor1'
     if vcam == None:
-        vcam = Capturing(2,data)
+        vcam = Capturing(0,data)
         
     while True:
         name , frame = vcam.get_frame()
         current_name = name
         print("the name is : ")
         print(current_name)
-        if current_name:
+
+        if current_name != prev_name and len(current_name)>0:
             add_info(current_name,camName)
+            prev_name = current_name
+            # You could also pass datetime.time object in this part and convert it to string.
+            prev_time = str(datetime.now().strftime("%H:%M:%S")) 
+        else:            
+            time_now = str(datetime.now().strftime("%H:%M:%S"))
+            diff = datetime.strptime(time_now, "%H:%M:%S") - datetime.strptime(prev_time, "%H:%M:%S")            
+            # Get the time in hours i.e. 9.60, 8.5
+            result = diff.seconds
+            print(result)
+            if result >= 10:
+                prev_name=[]
+                prev_time = ""
+                print("resetting time")
+            
+            
+
         current_name = []
         if frame != None:
             cam_frame = frame
@@ -239,8 +296,8 @@ def getName():
     status = json['status']
     print("status "+ status)
     if status == "true":
-        print(current_name)
-        return jsonify(name = current_name)
+        print(prev_name)
+        return jsonify(name = prev_name)
     else:
         return jsonify(name="")
 
