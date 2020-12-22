@@ -1,3 +1,5 @@
+import sqlite3
+
 class student:
 
     def __init__(self,Fname,Lname,sid,email,age,gender):
@@ -43,18 +45,25 @@ class student_info:
          }
         csv_file.append_file(data)
 
-
-        
-
-
-    # @property
-    # def age(self): 
-    #     return self._age 
-       
-    #  # a setter function 
-    # @age.setter 
-    # def age(self, a): 
-    #     if(a <= 0): 
-    #        raise ValueError("Sorry you age is not valid") 
-    #     self._age = a 
     
+    def getData(sid):
+        conn = sqlite3.connect('student.db')
+        print("Opened database successfully")
+        cursor = conn.execute("SELECT first_name,last_name,sid,email,age,gender From student WHERE first_name = " + '"' + sid + '"')
+        for row in cursor:
+            print("first_name " + row[0])
+            print("last_name " + row[1])
+            print("sid " + row[2])
+            print("email " + row[3])
+            print("age  " + row[4])
+            print("gender  " + row[5])
+        print("Operation done successfully")
+        conn.close()
+        return {
+            'first_name' :  row[0] ,
+            'last_name' :   row[1],
+            'sid':  row[2],
+            'email' :   row[3],
+            'age' :     row[4],
+            'gender' :  row[5]
+        }

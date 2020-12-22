@@ -27,7 +27,7 @@ cam_frame = None
 video_camera = None
 global_frame = None
 g_frame = None
-prev_time = ""
+prev_time = None
 prev_name = ""
 current_name = ""
 count = 0
@@ -138,7 +138,7 @@ def trainer():
     global counter
     global f
     if f is None:
-        f = face_encoder('encodings_Allolf.pickle','dataset','hog')
+        f = face_encoder('encodings_All.pickle','dataset','hog')
         f.start()
     if request.method == 'POST':
         json = request.get_json()
@@ -212,6 +212,9 @@ def cam_stream():
     global current_name
     global prev_name
     global prev_time
+
+    if prev_time == None:
+        prev_time = str(datetime.now().strftime("%H:%M:%S"))
     print('loadings')
     camName = 'Corridor1'
     if vcam == None:
@@ -228,13 +231,13 @@ def cam_stream():
             prev_name = current_name
             # You could also pass datetime.time object in this part and convert it to string.
             prev_time = str(datetime.now().strftime("%H:%M:%S")) 
-        else:            
+        elif current_name == prev_name and  len(current_name)>0:         
             time_now = str(datetime.now().strftime("%H:%M:%S"))
             diff = datetime.strptime(time_now, "%H:%M:%S") - datetime.strptime(prev_time, "%H:%M:%S")            
             # Get the time in hours i.e. 9.60, 8.5
             result = diff.seconds
             print(result)
-            if result >= 10:
+            if result >= 20:
                 prev_name=[]
                 prev_time = ""
                 print("resetting time")

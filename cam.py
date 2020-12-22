@@ -1,13 +1,10 @@
 import cv2
 import concurrent.futures
 import face_recognition
-# import argparse
-# import imutils
-# import pickle
-# import time
+import time
 import numpy as np
-import cv2
-# import os
+from student import student_info
+import sqlite3
 
 
 class Capturing ():
@@ -39,7 +36,6 @@ class Capturing ():
         self.faceCascade = cv2.CascadeClassifier(self.cascadePath)
 
         self.cap =  cv2.VideoCapture(camera)
-
 
     def haarReco(self,img):
         # cv2.imshow('camera',img) 
@@ -83,9 +79,39 @@ class Capturing ():
         
         return name.lower()
 
+    # make it a seperate thread
+    def getData(self,sid):
+        row = []
+        conn = sqlite3.connect('student.db')
+        # print("Opened database successfully")
+        cursor = conn.execute("SELECT first_name,last_name,sid,email,age,gender From student WHERE first_name = " + '"' + sid + '"')
+        # for row in cursor:
+        #     print("first_name " + row[0])
+        #     print("last_name " + row[1])
+        #     print("sid " + row[2])
+        #     print("email " + row[3])
+        #     print("age  " + row[4])
+        #     print("gender  " + row[5])
+        # print("Operation done successfully")
+        row = cursor.fetchone()
+        # print(row)
+        conn.close()
+        if row:
+            return {
+                'first_name' :  row[0] ,
+                'last_name' :   row[1],
+                'sid':  row[2],
+                'email' :   row[3],
+                'age' :     row[4],
+                'gender' :  row[5]
+            }
+        return None
+    # 
+
     def get_frame(self):
       
         self.current_name  = ""
+        self.nameList = []
         success, img = self.cap.read()
         
         # means 1/4th of orignal image
@@ -167,10 +193,18 @@ class Capturing ():
                 if name1.lower() == name2.lower() or haarName == name2.lower():
                     print("all match match")
                     name = name1
+                    if(name != "unknown"):
+                        result = self.getData(sid=name) # sometimes code returns NONE so we are making sure
+                        if result:
+                            self.std_info = result
+                        # print(self.std_info)
             names.append(name)
             self.nameList = names
         #======================End Compare==============================================================#
-
+        #
+            # Fetching DATA
+        
+        #
         # loop over the recognized faces
         for ((top, right, bottom, left), name) in zip(facesCurFrame, names):
     		# rescale the face coordinates
@@ -182,6 +216,8 @@ class Capturing ():
             cv2.rectangle(img, (left, top), (right, bottom),(0, 255, 0), 2)
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(img, name.upper(), (left, y), cv2.FONT_HERSHEY_SIMPLEX,0.75, (0, 255, 0), 2)
+            if(name.upper() != "UNKNOWN"):
+                cv2.putText(img, self.std_info['sid'], (left+100, y), cv2.FONT_HERSHEY_SIMPLEX,0.75, (0, 255, 0), 2)
         #================================================================================================ #
 
         # for orignal
